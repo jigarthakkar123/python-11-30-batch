@@ -43,6 +43,7 @@
 	 <li class=""><a href="{% url 'special-offer' %}">Specials Offer</a></li>
 	 <li class=""><a href="{% url 'wishlist' %}">Wishlist({{request.session.wishlist_count}})</a></li>
 	 <li class=""><a href="{% url 'cart' %}">Cart({{request.session.cart_count}})</a></li>
+	 <li class=""><a href="{% url 'myorder' %}">My Order</a></li>
 	 <li class=""><a href="{% url 'contact' %}">Contact</a></li>
 	 {% if request.session.email %}
 	 <li class=""><a href="{% url 'change-password' %}">Change Password</a></li>

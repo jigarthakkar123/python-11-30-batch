@@ -41,7 +41,7 @@ def login(request):
 					request.session['fname']=user.fname
 					wishlists=Wishlist.objects.filter(user=user)
 					request.session['wishlist_count']=len(wishlists)
-					carts=Cart.objects.filter(user=user)
+					carts=Cart.objects.filter(user=user,payment_status=False)
 					request.session['cart_count']=len(carts)
 					return render(request,'index.html')
 				else:
@@ -218,7 +218,7 @@ def product_detail(request,pk):
 	except:
 		pass
 	try:
-		Cart.objects.get(user=user,product=product)
+		Cart.objects.get(user=user,product=product,payment_status=False)
 		cart_flag=True
 	except:
 		pass
@@ -259,7 +259,7 @@ def add_to_cart(request,pk):
 def cart(request):
 	net_price=0
 	user=User.objects.get(email=request.session['email'])
-	carts=Cart.objects.filter(user=user)
+	carts=Cart.objects.filter(user=user,payment_status=False)
 	request.session['cart_count']=len(carts)
 	for i in carts:
 		net_price=net_price+i.total_price
@@ -305,18 +305,19 @@ def create_checkout_session(request):
 	return JsonResponse({'id': session.id})
 
 def success(request):
-	# user=User.objects.get(email=request.session['email'])
-	# carts=Cart.objects.filter(user=user,payment_status=False)
-	# for i in carts:
-	# 	i.payment_status=True
-	# 	i.save()
-	# 	product=Product.objects.get(id=i.product.id)
-	# 	product.cart_status=False
-	# 	product.save()
-		
-	# carts=Cart.objects.filter(user=user,payment_status=False)
-	# request.session['cart_count']=len(carts)
+	user=User.objects.get(email=request.session['email'])
+	carts=Cart.objects.filter(user=user,payment_status=False)
+	for i in carts:
+		i.payment_status=True
+		i.save()
+	carts=Cart.objects.filter(user=user,payment_status=False)
+	request.session['cart_count']=len(carts)
 	return render(request,'success.html')
 
 def cancel(request):
 	return render(request,'cancel.html')
+
+def myorder(request):
+	user=User.objects.get(email=request.session['email'])
+	carts=Cart.objects.filter(user=user,payment_status=True)
+	return render(request,'myorder.html',{'carts':carts})
